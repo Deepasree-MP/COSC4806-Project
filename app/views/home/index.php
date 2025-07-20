@@ -1,16 +1,17 @@
-  <div class="container">
-
-  <?php if (isset($_SESSION['just_logged_in'])): ?>
-  <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
-    <div id="loginToast" class="toast align-items-center text-white bg-success border-0"
-         role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
-      <div class="d-flex">
-        <div class="toast-body">
-          Welcome back, <?= htmlspecialchars($_SESSION['username']); ?>!
-        </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
+<div class="container mt-4">
+  <?php if (isset($_SESSION['auth']) && $_SESSION['auth'] == 1): ?>
+    <div class="alert alert-success">
+      Welcome back, <strong><?= htmlspecialchars($_SESSION['user']['username']); ?></strong>!<br>
+      You logged in at: <?= date('Y-m-d H:i:s'); ?>
     </div>
-  </div>
+  <?php else: ?>
+    <div class="alert alert-warning">
+      You are not logged in.
+    </div>
   <?php endif; ?>
+  <div class="mt-3">
+    <a href="/login" class="btn btn-primary">
+      🔐 Go to Login Page
+    </a>
+  </div>
+</div>
