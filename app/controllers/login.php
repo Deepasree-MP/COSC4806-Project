@@ -1,0 +1,44 @@
+<?php
+
+class Login extends Controller {
+
+    public function index() {
+        // Show login form
+        $this->view('login');
+    }
+
+    public function authenticate() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = $_POST['username'] ?? '';
+            $password = $_POST['password'] ?? '';
+
+            $userModel = $this->model('User');
+            $user = $userModel->findByUsername($username);
+
+            if ($user && hash('sha256', $password) === $user['password_hash']) {
+                $_SESSION['auth'] = 1;
+                $_SESSION['user'] = $user;
+                $_SESSION['role'] = $user['role'];
+
+                // Optional: Log login
+                $userModel->logLogin($user['id']);
+
+                header('Location: /home');
+                exit;
+            } else {
+                $_SESSION['error'] = "Invalid username or password";
+                header('Location: /login');
+                exit;
+            }
+        } else {
+            header('Location: /login');
+            exit;
+        }
+    }
+
+    public function logout() {
+        session_destroy();
+        header('Location: /login');
+        exit;
+    }
+}
