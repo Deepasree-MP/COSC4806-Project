@@ -61,25 +61,23 @@
             $existingRating = $stmt->fetchColumn();
           ?>
 
-          <?php if ($existingRating): ?>
-            <div class="alert alert-info" role="alert">
-              You already rated this movie: <strong><?= $existingRating ?>/5</strong>
+          <form method="POST" action="/movie/rate" aria-label="Rate form">
+            <input type="hidden" name="movie_title" value="<?= htmlspecialchars($movie['Title']) ?>">
+            <div class="mb-3">
+              <label for="rating" class="form-label">
+                <?= $existingRating ? 'Update Your Rating' : 'Your Rating (1 to 5)' ?>:
+              </label>
+              <select name="rating" id="rating" class="form-select" required>
+                <option value="">Select rating</option>
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                  <option value="<?= $i ?>" <?= ($existingRating == $i) ? 'selected' : '' ?>><?= $i ?></option>
+                <?php endfor; ?>
+              </select>
             </div>
-          <?php else: ?>
-            <form method="POST" action="/movie/rate" aria-label="Rate form">
-              <input type="hidden" name="movie_title" value="<?= htmlspecialchars($movie['Title']) ?>">
-              <div class="mb-3">
-                <label for="rating" class="form-label">Your Rating (1 to 5):</label>
-                <select name="rating" id="rating" class="form-select" required>
-                  <option value="">Select rating</option>
-                  <?php for ($i = 1; $i <= 5; $i++): ?>
-                    <option value="<?= $i ?>"><?= $i ?></option>
-                  <?php endfor; ?>
-                </select>
-              </div>
-              <button class="btn btn-success">Submit Rating</button>
-            </form>
-          <?php endif; ?>
+            <button class="btn btn-success">
+              <?= $existingRating ? 'Update Rating' : 'Submit Rating' ?>
+            </button>
+          </form>
         <?php else: ?>
           <div class="alert alert-warning">Please <a href="/login">sign in</a> to rate this movie.</div>
         <?php endif; ?>
