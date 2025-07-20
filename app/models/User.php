@@ -55,4 +55,11 @@ class User {
         $stmt->execute([$userId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getSearchLogs($limit = 100) {
+        $stmt = $this->conn->prepare("SELECT l.movie_title, l.created_at, u.username FROM mv_search_logs l LEFT JOIN mv_users u ON l.user_id = u.id ORDER BY l.created_at DESC LIMIT ?");
+        $stmt->bindValue(1, (int) $limit, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

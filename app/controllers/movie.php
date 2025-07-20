@@ -119,4 +119,35 @@ class Movie extends Controller {
         $topMovies = $userModel->getTopRatedMovies(10);
         $this->view('movie/top', ['topMovies' => $topMovies]);
     }
+
+    public function myratings() {
+        error_log("Movie::myratings() called");
+
+        if (!isset($_SESSION['user']['id'])) {
+            $_SESSION['error'] = "Please log in to view your ratings.";
+            header("Location: /login");
+            exit;
+        }
+
+        $userId = $_SESSION['user']['id'];
+        $userModel = $this->model('User');
+        $ratings = $userModel->getRatingsByUser($userId);
+
+        $this->view('movie/myratings', ['ratings' => $ratings]);
+    }
+
+    public function logs() {
+        error_log("Movie::logs() called");
+
+        if (!isset($_SESSION['user']) || $_SESSION['role'] !== 'admin') {
+            error_log("Unauthorized access to logs()");
+            header("Location: /login");
+            exit;
+        }
+
+        $userModel = $this->model('User');
+        $logs = $userModel->getSearchLogs(100);
+
+        $this->view('movie/logs', ['logs' => $logs]);
+    }
 }
