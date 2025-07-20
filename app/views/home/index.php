@@ -9,9 +9,14 @@
       You are not logged in.
     </div>
   <?php endif; ?>
-  <div class="mt-3">
+
+  <div class="mt-4 d-flex gap-3">
     <a href="/login" class="btn btn-primary">
-      🔐 Go to Login Page
+      Go to Login Page
+    </a>
+  </br>
+    <a href="/movie" class="btn btn-success">
+      🎬 Search Movie
     </a>
   </div>
 </div>
