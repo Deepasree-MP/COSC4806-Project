@@ -41,4 +41,18 @@ class Login extends Controller {
         header('Location: /login');
         exit;
     }
+
+    public function test() {
+        $userModel = $this->model('User');
+        $user = $userModel->findByUsername('admin');
+
+        if ($user) {
+            echo "Admin Found: " . $user['username'] . " | Role: " . $user['role'] . "<br>";
+            $userModel->logLogin($user['id']);
+            echo "Login Logged.";
+        } else {
+            echo "Admin user not found.";
+        }
+    }
+
 }
