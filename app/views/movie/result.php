@@ -4,6 +4,16 @@
 <div class="container mt-4" role="main">
   <a href="/movie" class="btn btn-secondary mb-3">← Back to Search</a>
 
+  <?php if (!empty($_SESSION['success'])): ?>
+    <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success']) ?></div>
+    <?php unset($_SESSION['success']); ?>
+  <?php endif; ?>
+
+  <?php if (!empty($_SESSION['error'])): ?>
+    <div class="alert alert-danger"><?= htmlspecialchars($_SESSION['error']) ?></div>
+    <?php unset($_SESSION['error']); ?>
+  <?php endif; ?>
+
   <?php if (!empty($log['error'])): ?>
     <?php error_log("View: result.php - Error: " . $log['error']); ?>
     <div class="alert alert-danger" role="alert">
@@ -34,12 +44,26 @@
           </div>
         </div>
 
+        <?php
+          $db = db_connect();
+          $existingRating = null;
+          if (isset($_SESSION['user']['id'])) {
+              $stmt = $db->prepare("SELECT rating FROM mv_ratings WHERE movie_title = ? AND user_id = ? LIMIT 1");
+              $stmt->execute([$movie['Title'], $_SESSION['user']['id']]);
+              $existingRating = $stmt->fetchColumn();
+          }
+        ?>
+
         <?php if (isset($avgRating)): ?>
           <div aria-label="Average user rating">
             <strong>Avg User Rating:</strong> <?= $avgRating ?>/5
           </div>
         <?php else: ?>
           <div><em>No ratings yet</em></div>
+        <?php endif; ?>
+
+        <?php if ($existingRating): ?>
+          <div><strong>Your Rating:</strong> <?= $existingRating ?>/5</div>
         <?php endif; ?>
 
         <p class="mt-3" aria-label="Movie plot"><?= htmlspecialchars($movie['Plot']) ?></p>
@@ -54,13 +78,6 @@
 
         <h4 class="mt-4">Rate this movie</h4>
         <?php if (isset($_SESSION['user']['id'])): ?>
-          <?php
-            $db = db_connect();
-            $stmt = $db->prepare("SELECT rating FROM mv_ratings WHERE movie_title = ? AND user_id = ? LIMIT 1");
-            $stmt->execute([$movie['Title'], $_SESSION['user']['id']]);
-            $existingRating = $stmt->fetchColumn();
-          ?>
-
           <form method="POST" action="/movie/rate" aria-label="Rate form">
             <input type="hidden" name="movie_title" value="<?= htmlspecialchars($movie['Title']) ?>">
             <div class="mb-3">
@@ -82,10 +99,13 @@
           <div class="alert alert-warning">Please <a href="/login">sign in</a> to rate this movie.</div>
         <?php endif; ?>
 
+        <!-- DEBUG for AI Review -->
+        <pre style="color: red;">DEBUG: <?= htmlspecialchars($review ?? 'REVIEW NOT SET') ?></pre>
+
         <?php if (!empty($review)): ?>
           <hr class="my-4" />
           <h4>AI-Generated Review</h4>
-          <div class="alert alert-info">
+          <div class="alert alert-info" aria-live="polite">
             <?= nl2br(htmlspecialchars($review)) ?>
           </div>
         <?php endif; ?>
@@ -101,8 +121,10 @@
     <pre class="bg-light p-3 border">
 API Key: <?= htmlspecialchars($log['api_key'] ?? 'N/A') ?>
 
+
 Request URL:
 <?= htmlspecialchars($log['url'] ?? '') ?>
+
 
 Raw Response:
 <?= htmlspecialchars($log['raw_response'] ?? '') ?>

@@ -15,12 +15,13 @@ class Movie extends Controller {
 
         $movie = null;
         $log = [];
+        $review = null;
 
         if (empty($title)) {
             $log['error'] = "Please enter a movie title.";
             error_log("Error: " . $log['error']);
         } else {
-            $apiKey = getenv('OMDB_API_KEY');
+            $apiKey = $_ENV['OMDB_API_KEY'] ?? null;
             error_log("OMDB_API_KEY fetched: " . ($apiKey ? 'Exists' : 'Missing'));
 
             if (!$apiKey) {
@@ -54,6 +55,22 @@ class Movie extends Controller {
 
                     $avgRating = $userModel->getAverageRating($title);
                     error_log("Avg rating for $title: " . ($avgRating ?? 'none'));
+
+                    // ✅ Always trigger Gemini review if rating exists
+                    if (isset($_SESSION['user']['id'])) {
+                        $db = db_connect();
+                        $stmt = $db->prepare("SELECT rating FROM mv_ratings WHERE movie_title = ? AND user_id = ? LIMIT 1");
+                        $stmt->execute([$title, $_SESSION['user']['id']]);
+                        $userRating = $stmt->fetchColumn();
+
+                        error_log("User rating for Gemini: " . ($userRating ?? 'none'));
+
+                        if ($userRating) {
+                            require_once 'app/models/Api.php';
+                            $review = Api::getGeminiReview($title, $userRating);
+                            error_log("Gemini review generated.");
+                        }
+                    }
                 }
             }
         }
@@ -62,7 +79,8 @@ class Movie extends Controller {
             'movie' => $movie,
             'log' => $log,
             'title' => $title,
-            'avgRating' => $avgRating ?? null
+            'avgRating' => $avgRating ?? null,
+            'review' => $review
         ]);
     }
 
@@ -109,7 +127,7 @@ class Movie extends Controller {
             $_SESSION['error'] = "Rating failed.";
         }
 
-        header("Location: /movie?rated=" . urlencode($movieTitle));
+        header("Location: /movie?title=" . urlencode($movieTitle) . "&rated=1");
         exit;
     }
 
