@@ -35,4 +35,11 @@ class User {
         $stmt->execute([$title, $userId]);
         error_log("Search saved in mv_search_logs: $title, user_id=" . ($userId ?? 'guest'));
     }
+
+    public function getAverageRating($title) {
+        $stmt = $this->conn->prepare("SELECT AVG(rating) as avg_rating FROM mv_ratings WHERE movie_title = ?");
+        $stmt->execute([$title]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row && $row['avg_rating'] ? round($row['avg_rating'], 2) : null;
+    }
 }

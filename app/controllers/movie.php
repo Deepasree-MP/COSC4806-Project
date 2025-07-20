@@ -48,15 +48,22 @@ class Movie extends Controller {
                     $movie = $decoded;
                     error_log("Movie data successfully decoded: " . print_r($movie, true));
 
-                    // Log search
                     $userModel = $this->model('User');
                     $userModel->logSearch($title);
                     error_log("Search logged: " . $title);
+
+                    $avgRating = $userModel->getAverageRating($title);
+                    error_log("Avg rating for $title: " . ($avgRating ?? 'none'));
                 }
             }
         }
 
-        $this->view('movie/result', ['movie' => $movie, 'log' => $log, 'title' => $title]);
+        $this->view('movie/result', [
+            'movie' => $movie,
+            'log' => $log,
+            'title' => $title,
+            'avgRating' => $avgRating ?? null
+        ]);
     }
 
     public function rate() {

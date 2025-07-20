@@ -34,6 +34,14 @@
           </div>
         </div>
 
+        <?php if (isset($avgRating)): ?>
+          <div aria-label="Average user rating">
+            <strong>Avg User Rating:</strong> <?= $avgRating ?>/5
+          </div>
+        <?php else: ?>
+          <div><em>No ratings yet</em></div>
+        <?php endif; ?>
+
         <p class="mt-3" aria-label="Movie plot"><?= htmlspecialchars($movie['Plot']) ?></p>
 
         <ul class="list-unstyled">
@@ -45,19 +53,36 @@
         <hr />
 
         <h4 class="mt-4">Rate this movie</h4>
-        <form method="POST" action="/movie/rate" aria-label="Rate form">
-          <input type="hidden" name="movie_title" value="<?= htmlspecialchars($movie['Title']) ?>">
-          <div class="mb-3">
-            <label for="rating" class="form-label">Your Rating (1 to 5):</label>
-            <select name="rating" id="rating" class="form-select" required>
-              <option value="">Select rating</option>
-              <?php for ($i = 1; $i <= 5; $i++): ?>
-                <option value="<?= $i ?>"><?= $i ?></option>
-              <?php endfor; ?>
-            </select>
-          </div>
-          <button class="btn btn-success">Submit Rating</button>
-        </form>
+        <?php if (isset($_SESSION['user']['id'])): ?>
+          <?php
+            $db = db_connect();
+            $stmt = $db->prepare("SELECT rating FROM mv_ratings WHERE movie_title = ? AND user_id = ? LIMIT 1");
+            $stmt->execute([$movie['Title'], $_SESSION['user']['id']]);
+            $existingRating = $stmt->fetchColumn();
+          ?>
+
+          <?php if ($existingRating): ?>
+            <div class="alert alert-info" role="alert">
+              You already rated this movie: <strong><?= $existingRating ?>/5</strong>
+            </div>
+          <?php else: ?>
+            <form method="POST" action="/movie/rate" aria-label="Rate form">
+              <input type="hidden" name="movie_title" value="<?= htmlspecialchars($movie['Title']) ?>">
+              <div class="mb-3">
+                <label for="rating" class="form-label">Your Rating (1 to 5):</label>
+                <select name="rating" id="rating" class="form-select" required>
+                  <option value="">Select rating</option>
+                  <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <option value="<?= $i ?>"><?= $i ?></option>
+                  <?php endfor; ?>
+                </select>
+              </div>
+              <button class="btn btn-success">Submit Rating</button>
+            </form>
+          <?php endif; ?>
+        <?php else: ?>
+          <div class="alert alert-warning">Please <a href="/login">sign in</a> to rate this movie.</div>
+        <?php endif; ?>
       </div>
     </div>
   <?php else: ?>
