@@ -8,27 +8,31 @@ class User {
         $this->conn = db_connect();
     }
 
-    // 🔐 Fetch user by username
     public function findByUsername($username) {
         $stmt = $this->conn->prepare("SELECT * FROM mv_users WHERE username = ?");
         $stmt->execute([$username]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);  // returns false if not found
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // 🕒 Log login time in mv_login_logs
     public function logLogin($user_id) {
         $stmt = $this->conn->prepare("INSERT INTO mv_login_logs (user_id) VALUES (?)");
         $stmt->execute([$user_id]);
     }
 
-    // 🛡️ Check if current session user is admin
     public function isAdmin() {
         return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
     }
 
-    // 🧾 Optional: Get all users (for admin report page)
     public function getAllUsers() {
         $stmt = $this->conn->query("SELECT * FROM mv_users");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function logSearch($title) {
+        $conn = db_connect();
+        $userId = $_SESSION['user']['id'] ?? null;
+        $stmt = $conn->prepare("INSERT INTO mv_search_logs (movie_title, user_id) VALUES (?, ?)");
+        $stmt->execute([$title, $userId]);
+        error_log("Search saved in mv_search_logs: $title, user_id=" . ($userId ?? 'guest'));
     }
 }

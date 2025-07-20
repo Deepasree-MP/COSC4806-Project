@@ -1,3 +1,4 @@
+<?php require_once 'app/views/templates/header.php'; ?>
 <?php error_log("View: movie/index.php loaded"); ?>
 
 <div class="container mt-4">
@@ -15,3 +16,4 @@
     <button class="btn btn-primary">Search</button>
   </form>
 </div>
+<?php require_once 'app/views/templates/footer.php'; ?>

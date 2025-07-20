@@ -1,3 +1,4 @@
+<?php require_once 'app/views/templates/header.php'; ?>
 <div class="container mt-4">
   <?php if (isset($_SESSION['auth']) && $_SESSION['auth'] == 1): ?>
     <div class="alert alert-success">
@@ -20,3 +21,5 @@
     </a>
   </div>
 </div>
+<?php require_once 'app/views/templates/footer.php'; ?>
+

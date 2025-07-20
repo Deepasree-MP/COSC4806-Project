@@ -36,6 +36,8 @@ class Movie extends Controller {
                 $decoded = json_decode($response, true);
 
                 $log = [
+                    'api_key' => $apiKey,
+                    'url' => $url,
                     'raw_response' => $response
                 ];
 
@@ -45,11 +47,53 @@ class Movie extends Controller {
                 } else {
                     $movie = $decoded;
                     error_log("Movie data successfully decoded: " . print_r($movie, true));
+
+                    // Log search
+                    $userModel = $this->model('User');
+                    $userModel->logSearch($title);
+                    error_log("Search logged: " . $title);
                 }
             }
         }
 
-        error_log("Rendering movie/result.php view");
         $this->view('movie/result', ['movie' => $movie, 'log' => $log, 'title' => $title]);
+    }
+
+    public function rate() {
+        error_log("Movie::rate() called");
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            error_log("Invalid method for rating");
+            header("Location: /movie");
+            exit;
+        }
+
+        $movieTitle = trim($_POST['movie_title'] ?? '');
+        $rating = (int) ($_POST['rating'] ?? 0);
+        $userId = $_SESSION['user']['id'] ?? null;
+
+        error_log("POST Data - Title: $movieTitle | Rating: $rating | User ID: " . ($userId ?? 'guest'));
+
+        if ($rating < 1 || $rating > 5 || empty($movieTitle)) {
+            error_log("Invalid rating or empty title");
+            $_SESSION['error'] = "Invalid input.";
+            header("Location: /movie");
+            exit;
+        }
+
+        try {
+            $db = db_connect();
+            $stmt = $db->prepare("INSERT INTO mv_ratings (movie_title, rating, user_id) VALUES (?, ?, ?)");
+            $stmt->execute([$movieTitle, $rating, $userId]);
+
+            error_log("Rating INSERT successful.");
+            $_SESSION['success'] = "Thanks for rating!";
+        } catch (PDOException $e) {
+            error_log("Rating INSERT failed: " . $e->getMessage());
+            $_SESSION['error'] = "Failed to submit rating.";
+        }
+
+        header("Location: /movie?rated=" . urlencode($movieTitle));
+        exit;
     }
 }
