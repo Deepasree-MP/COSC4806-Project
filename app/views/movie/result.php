@@ -81,6 +81,14 @@
         <?php else: ?>
           <div class="alert alert-warning">Please <a href="/login">sign in</a> to rate this movie.</div>
         <?php endif; ?>
+
+        <?php if (!empty($review)): ?>
+          <hr class="my-4" />
+          <h4>AI-Generated Review</h4>
+          <div class="alert alert-info">
+            <?= nl2br(htmlspecialchars($review)) ?>
+          </div>
+        <?php endif; ?>
       </div>
     </div>
   <?php else: ?>
@@ -93,10 +101,8 @@
     <pre class="bg-light p-3 border">
 API Key: <?= htmlspecialchars($log['api_key'] ?? 'N/A') ?>
 
-
 Request URL:
 <?= htmlspecialchars($log['url'] ?? '') ?>
-
 
 Raw Response:
 <?= htmlspecialchars($log['raw_response'] ?? '') ?>
