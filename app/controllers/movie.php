@@ -90,17 +90,33 @@ class Movie extends Controller {
 
         try {
             $db = db_connect();
-            $stmt = $db->prepare("INSERT INTO mv_ratings (movie_title, rating, user_id) VALUES (?, ?, ?)");
-            $stmt->execute([$movieTitle, $rating, $userId]);
+            $stmt = $db->prepare("SELECT id FROM mv_ratings WHERE movie_title = ? AND user_id = ?");
+            $stmt->execute([$movieTitle, $userId]);
 
-            error_log("Rating INSERT successful.");
-            $_SESSION['success'] = "Thanks for rating!";
+            if ($stmt->fetchColumn()) {
+                $update = $db->prepare("UPDATE mv_ratings SET rating = ?, created_at = CURRENT_TIMESTAMP WHERE movie_title = ? AND user_id = ?");
+                $update->execute([$rating, $movieTitle, $userId]);
+                error_log("Rating updated for $movieTitle");
+                $_SESSION['success'] = "Rating updated!";
+            } else {
+                $insert = $db->prepare("INSERT INTO mv_ratings (movie_title, rating, user_id) VALUES (?, ?, ?)");
+                $insert->execute([$movieTitle, $rating, $userId]);
+                error_log("New rating inserted for $movieTitle");
+                $_SESSION['success'] = "Thanks for rating!";
+            }
         } catch (PDOException $e) {
-            error_log("Rating INSERT failed: " . $e->getMessage());
-            $_SESSION['error'] = "Failed to submit rating.";
+            error_log("Rating error: " . $e->getMessage());
+            $_SESSION['error'] = "Rating failed.";
         }
 
         header("Location: /movie?rated=" . urlencode($movieTitle));
         exit;
+    }
+
+    public function top() {
+        error_log("Movie::top() called");
+        $userModel = $this->model('User');
+        $topMovies = $userModel->getTopRatedMovies(10);
+        $this->view('movie/top', ['topMovies' => $topMovies]);
     }
 }
