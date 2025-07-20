@@ -9,53 +9,49 @@ class App {
 
     public function __construct() {
         $url = $this->parseUrl();
+        error_log("Parsed URL: " . print_r($url, true));
 
-        // If no controller in URL, default based on login status
         if (!isset($url[1]) || empty($url[1])) {
             $this->controller = isset($_SESSION['auth']) && $_SESSION['auth'] == 1 ? 'home' : 'login';
+            error_log("Default controller selected: {$this->controller}");
         }
 
-        // If controller exists in URL, load it
         if (isset($url[1]) && file_exists('app/controllers/' . $url[1] . '.php')) {
             $this->controller = $url[1];
-            $_SESSION['controller'] = $this->controller;
+            error_log("Controller file found: {$this->controller}");
 
-            // If it's a special URL, always default to 'index' method
             if (in_array($this->controller, $this->special_url)) {
                 $this->method = 'index';
             }
 
             unset($url[1]);
         } elseif (!file_exists('app/controllers/' . $this->controller . '.php')) {
-            // Redirect to home if controller file doesn't exist
+            error_log("Controller file not found: {$this->controller}. Redirecting to /home.");
             header('Location: /home');
             die;
         }
 
-        // Load the controller file
         require_once 'app/controllers/' . $this->controller . '.php';
-
-        // Instantiate the controller class
         $this->controller = new $this->controller;
 
-        // Check for method in URL
         if (isset($url[2]) && method_exists($this->controller, $url[2])) {
             $this->method = $url[2];
-            $_SESSION['method'] = $this->method;
+            error_log("Method set: {$this->method}");
             unset($url[2]);
+        } else {
+            error_log("Default method used: {$this->method}");
         }
 
-        // Set params
         $this->params = $url ? array_values($url) : [];
+        error_log("Params: " . print_r($this->params, true));
 
-        // Run the controller + method + params
-        call_user_func_array([$this->controller, $this->method], $this->params);		
+        call_user_func_array([$this->controller, $this->method], $this->params);
     }
 
     public function parseUrl() {
         $u = "{$_SERVER['REQUEST_URI']}";
         $url = explode('/', filter_var(rtrim($u, '/'), FILTER_SANITIZE_URL));
-        unset($url[0]); // remove first empty part
+        unset($url[0]);
         return $url;
     }
 }

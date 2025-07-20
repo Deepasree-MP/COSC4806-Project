@@ -6,48 +6,38 @@ class Movie extends Controller {
     }
 
     public function search() {
-        if (isset($_GET['title']) && !empty($_GET['title'])) {
-            $title = urlencode($_GET['title']);
+        $title = isset($_GET['title']) ? trim($_GET['title']) : '';
+        $movie = null;
+        $log = [];
+
+        if (empty($title)) {
+            $log['error'] = "Please enter a movie title.";
+        } else {
             $apiKey = getenv('OMDB_API_KEY');
 
-            // DEBUG: If secret is missing
             if (!$apiKey) {
-                $this->view('movie/result', ['movie' => null, 'log' => ['error' => 'API key is missing from environment.']]);
-                return;
+                $log['error'] = "API key is missing from environment.";
+            } else {
+                $url = "http://www.omdbapi.com/?apikey=$apiKey&t=" . urlencode($title);
+                $response = @file_get_contents($url);
+                $decoded = json_decode($response, true);
+
+                $log = [
+                    'api_key' => $apiKey,
+                    'url' => $url,
+                    'raw_response' => $response
+                ];
+
+                if (!$decoded || $decoded['Response'] !== 'True') {
+                    $log['error'] = $decoded['Error'] ?? 'Invalid or no response from OMDb.';
+                } else {
+                    $movie = $decoded;
+                }
             }
-
-            $url = "http://www.omdbapi.com/?apikey=$apiKey&t=$title";
-
-            $response = @file_get_contents($url);  // suppress warning
-            $movie = json_decode($response, true);
-
-            // Check if the response is valid JSON
-            if (!$movie || !isset($movie['Response'])) {
-                $this->view('movie/result', [
-                    'movie' => null,
-                    'log' => [
-                        'api_key' => $apiKey,
-                        'url' => $url,
-                        'raw_response' => $response,
-                        'error' => 'Invalid or no response from OMDb API.'
-                    ]
-                ]);
-                return;
-            }
-
-            // Success
-            $log = [
-                'api_key' => $apiKey,
-                'url' => $url,
-                'raw_response' => $response
-            ];
-
-            $this->view('movie/result', ['movie' => $movie, 'log' => $log]);
-        } else {
-            $_SESSION['error'] = "Please enter a movie title.";
-            header('Location: /movie');
-            exit;
         }
+
+        $this->view('movie/index', ['movie' => $movie, 'log' => $log, 'title' => $title]);
     }
+
 
 }
