@@ -9,7 +9,7 @@
   <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark" aria-label="Main Navigation">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">🎬 MovieApp</a>
+      <a class="navbar-brand" href="/">MovieApp</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -35,7 +35,7 @@
         <ul class="navbar-nav mb-2 mb-lg-0">
           <?php if (!empty($_SESSION['auth'])): ?>
             <li class="nav-item">
-              <span class="navbar-text text-light me-2">Welcome, <?= htmlspecialchars($_SESSION['user']['username']) ?></span>
+              <!--<span class="navbar-text text-light me-2">Welcome, <?= htmlspecialchars($_SESSION['user']['username']) ?></span>-->
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/login/logout">Logout</a>
