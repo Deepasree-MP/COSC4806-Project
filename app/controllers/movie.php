@@ -37,7 +37,7 @@ class Movie extends Controller {
                     $userModel->logSearch($title);
                     $avgRating = $userModel->getAverageRating($title);
 
-                    // Build prompt with full movie context
+                    
                     $fullPrompt = "Give a short movie review for the movie titled '" . $movie['Title'] . "'.
 Released in " . $movie['Year'] . ", directed by " . $movie['Director'] . ", written by " . $movie['Writer'] . ",
 and starring " . $movie['Actors'] . ".";
@@ -100,7 +100,7 @@ and starring " . $movie['Actors'] . ".";
                 error_log("New rating inserted for $movieTitle");
             }
 
-            // Calculate new average
+            
             $userModel = $this->model('User');
             $avgRating = $userModel->getAverageRating($movieTitle);
 

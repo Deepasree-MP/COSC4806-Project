@@ -7,7 +7,7 @@ class Home extends Controller {
       $user = $this->model('User');
       $data = $user->getAllUsers();
 
-      //$this->view('home/index');
+      
       $this->view('home/index', ['users' => $data]);
       die;
     }

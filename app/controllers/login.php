@@ -3,7 +3,7 @@
 class Login extends Controller {
 
     public function index() {
-        // Show login form
+        
         $this->view('login/index');
     }
 
@@ -21,7 +21,7 @@ class Login extends Controller {
                 $_SESSION['role'] = $user['role'];
                 $_SESSION['login_time'] = date('Y-m-d H:i:s');
 
-                // Optional: Log login
+                
                 $userModel->logLogin($user['id']);
 
                 header('Location: /home');

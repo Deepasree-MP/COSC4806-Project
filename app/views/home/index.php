@@ -17,7 +17,7 @@
     </a>
   </br>
     <a href="/movie" class="btn btn-success">
-      🎬 Search Movie
+       Search Movie
     </a>
   </div>
 </div>

@@ -13,7 +13,7 @@
 
   <?php if (!empty($movie) && $movie['Response'] === 'True'): ?>
     <div class="row">
-      <!-- Poster -->
+      
       <div class="col-md-4 text-center position-relative">
         <img src="<?= $movie['Poster'] ?>" alt="Poster for <?= htmlspecialchars($movie['Title']) ?>" class="img-fluid rounded shadow-sm mb-3">
         <div id="loading-spinner" class="position-absolute top-50 start-50 translate-middle d-none">
@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <!-- Info and Ratings -->
+      
       <div class="col-md-8">
         <h1><?= htmlspecialchars($movie['Title']) ?></h1>
         <p class="text-muted">
@@ -77,7 +77,7 @@
 
         <?php if (!empty($review)): ?>
           <div class="alert alert-info mt-4 p-4 w-100">
-            <h5 class="mb-2">🎬 Gemini Review</h5>
+            <h5 class="mb-2"> Gemini Review</h5>
             <p class="mb-0"><?= nl2br(htmlspecialchars($review)) ?></p>
           </div>
         <?php endif; ?>

@@ -27,7 +27,7 @@ class Api
     {
         $apiKey = $_ENV['GEMINI_API_KEY'] ?? '';
         if (empty($apiKey)) {
-            error_log("❌ Gemini API key is missing.");
+            error_log("Gemini API key is missing.");
             return "Gemini API key not set.";
         }
 
@@ -36,12 +36,12 @@ class Api
             $prompt .= " from someone who rated it $rating out of 5.";
         }
 
-        error_log("🔁 Gemini Prompt: " . $prompt);
+        error_log(" Gemini Prompt: " . $prompt);
 
-        // ✅ Correct Gemini endpoint and model
+        
         $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
-        // ✅ Request body format
+        
         $payload = [
             "contents" => [
                 [
@@ -53,10 +53,10 @@ class Api
         ];
 
         $jsonData = json_encode($payload);
-        error_log("📡 Sending Gemini Request to: " . $url);
-        error_log("📝 Request Payload: " . $jsonData);
+        error_log(" Sending Gemini Request to: " . $url);
+        error_log(" Request Payload: " . $jsonData);
 
-        // ✅ Send the API key in the header (not query param)
+        
         $headers = [
             'Content-Type: application/json',
             "X-goog-api-key: $apiKey"
@@ -75,20 +75,20 @@ class Api
         curl_close($curl);
 
         if ($error) {
-            error_log("❌ CURL error: " . $error);
+            error_log("CURL error: " . $error);
             return "Failed to connect to Gemini API.";
         }
 
-        error_log("✅ Gemini Raw Response: " . $response);
+        error_log("Gemini Raw Response: " . $response);
 
         $parsed = json_decode($response, true);
         $review = $parsed['candidates'][0]['content']['parts'][0]['text'] ?? null;
 
         if ($review) {
-            error_log("✅ Gemini Parsed Review: " . $review);
+            error_log("Gemini Parsed Review: " . $review);
             return $review;
         } else {
-            error_log("❌ Gemini review could not be parsed.");
+            error_log("Gemini review could not be parsed.");
             return "No AI review could be generated at this time.";
         }
     }

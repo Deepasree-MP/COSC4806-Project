@@ -3,7 +3,7 @@
 
 <div class="container mt-4">
 
-  <!-- Welcome Message -->
+  
   <h4 class="mb-4">
     <?php if (!empty($_SESSION['auth'])): ?>
       Welcome, <strong><?= htmlspecialchars($_SESSION['user']['username']) ?></strong>!
@@ -12,7 +12,7 @@
     <?php endif; ?>
   </h4>
 
-  <!-- Search Form -->
+  
   <h2>Search for a Movie</h2>
 
   <?php if (!empty($_SESSION['error'])): ?>
