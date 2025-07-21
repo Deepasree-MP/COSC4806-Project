@@ -8,6 +8,13 @@ class User {
         $this->conn = db_connect();
     }
 
+    public function createUser($username, $hashed)
+    {
+        $stmt = $this->conn->prepare("INSERT INTO mv_users (username, password_hash) VALUES (?, ?)");
+        $stmt->execute([$username, $hashed]);
+        return $this->conn->lastInsertId();
+    }
+
     public function findByUsername($username) {
         $stmt = $this->conn->prepare("SELECT * FROM mv_users WHERE username = ?");
         $stmt->execute([$username]);
