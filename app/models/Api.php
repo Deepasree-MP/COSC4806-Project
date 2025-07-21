@@ -38,24 +38,35 @@ class Api
 
         error_log("🔁 Gemini Prompt: " . $prompt);
 
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" . $apiKey;
+        // ✅ Correct Gemini endpoint and model
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
-        $data = [
-            "contents" => [[
-                "role" => "user",
-                "parts" => [[ "text" => $prompt ]]
-            ]]
+        // ✅ Request body format
+        $payload = [
+            "contents" => [
+                [
+                    "parts" => [
+                        ["text" => $prompt]
+                    ]
+                ]
+            ]
         ];
 
-        $jsonData = json_encode($data);
+        $jsonData = json_encode($payload);
         error_log("📡 Sending Gemini Request to: " . $url);
         error_log("📝 Request Payload: " . $jsonData);
+
+        // ✅ Send the API key in the header (not query param)
+        $headers = [
+            'Content-Type: application/json',
+            "X-goog-api-key: $apiKey"
+        ];
 
         $curl = curl_init($url);
         curl_setopt_array($curl, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_HTTPHEADER => $headers,
             CURLOPT_POSTFIELDS => $jsonData
         ]);
 
@@ -81,4 +92,5 @@ class Api
             return "No AI review could be generated at this time.";
         }
     }
+
 }
