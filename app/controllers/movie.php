@@ -145,4 +145,24 @@ and starring " . $movie['Actors'] . ".";
         $logs = $userModel->getSearchLogs(100);
         $this->view('movie/logs', ['logs' => $logs]);
     }
+
+    public function autocomplete() {
+        header('Content-Type: application/json');
+        $title = $_GET['title'] ?? '';
+        if (!$title) {
+            echo json_encode([]);
+            exit;
+        }
+        $apiKey = $_ENV['OMDB_API_KEY'] ?? null;
+        $url = 'http://www.omdbapi.com/?apikey=' . $apiKey . '&s=' . urlencode($title) . '&type=movie';
+        $response = @file_get_contents($url);
+        $data = json_decode($response, true);
+        $results = [];
+        if ($data && !empty($data['Search'])) {
+            $results = array_slice($data['Search'], 0, 7); // Limit to top 7
+        }
+        echo json_encode($results);
+        exit;
+    }
+
 }
