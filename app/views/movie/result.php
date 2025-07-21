@@ -1,5 +1,4 @@
 <?php require_once 'app/views/templates/header.php'; ?>
-<?php error_log("View: movie/result.php loaded"); ?>
 
 <div class="container mt-4" role="main">
   <a href="/movie" class="btn btn-secondary mb-3">← Back to Search</a>
@@ -21,7 +20,6 @@
         </div>
       </div>
 
-      
       <div class="col-md-8">
         <h1><?= htmlspecialchars($movie['Title']) ?></h1>
         <p class="text-muted">
@@ -85,20 +83,6 @@
     </div>
   <?php else: ?>
     <div class="alert alert-warning">Movie not found.</div>
-  <?php endif; ?>
-
-  <?php if (!empty($log)): ?>
-    <hr>
-    <h5 class="mt-4">Debug Info</h5>
-    <pre class="bg-light p-3 border">
-API Key: <?= htmlspecialchars($log['api_key'] ?? 'N/A') ?>
-
-Request URL:
-<?= htmlspecialchars($log['url'] ?? '') ?>
-
-Raw Response:
-<?= htmlspecialchars($log['raw_response'] ?? '') ?>
-    </pre>
   <?php endif; ?>
 </div>
 

@@ -2,12 +2,20 @@
 
 class App {
 
-    protected $controller = 'login';
+    protected $controller = 'home'; // Set to 'home'
     protected $method = 'index';
     protected $special_url = ['apply'];
     protected $params = [];
 
     public function __construct() {
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        if (!isset($_SESSION['user_id']) && !isset($_SESSION['auth'])) {
+            session_unset();
+            session_destroy();
+            session_start();
+        }
         $url = $this->parseUrl();
         error_log("Parsed URL: " . print_r($url, true));
 
@@ -15,7 +23,7 @@ class App {
             $this->controller = $url[1];
             unset($url[1]);
         } elseif (!isset($url[1]) || empty($url[1])) {
-            $this->controller = isset($_SESSION['auth']) && $_SESSION['auth'] == 1 ? 'home' : 'login';
+            $this->controller = 'home'; // Always go to home for new/guest visitor
         }
 
         require_once 'app/controllers/' . $this->controller . '.php';
