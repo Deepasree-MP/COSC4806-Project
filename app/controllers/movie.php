@@ -67,12 +67,15 @@ and starring " . $movie['Actors'] . ".";
     }
 
     public function rate() {
-        error_log("Movie::rate() called");
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
             echo json_encode(['success' => false, 'error' => 'Invalid request method']);
-            return;
+            exit;
         }
 
         $movieTitle = trim($_POST['movie_title'] ?? '');
@@ -82,7 +85,7 @@ and starring " . $movie['Actors'] . ".";
         if (!$userId || $rating < 1 || $rating > 5 || empty($movieTitle)) {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Invalid input.']);
-            return;
+            exit;
         }
 
         try {
@@ -93,14 +96,11 @@ and starring " . $movie['Actors'] . ".";
             if ($stmt->fetchColumn()) {
                 $update = $db->prepare("UPDATE mv_ratings SET rating = ?, created_at = CURRENT_TIMESTAMP WHERE movie_title = ? AND user_id = ?");
                 $update->execute([$rating, $movieTitle, $userId]);
-                error_log("Rating updated for $movieTitle");
             } else {
                 $insert = $db->prepare("INSERT INTO mv_ratings (movie_title, rating, user_id) VALUES (?, ?, ?)");
                 $insert->execute([$movieTitle, $rating, $userId]);
-                error_log("New rating inserted for $movieTitle");
             }
 
-            
             $userModel = $this->model('User');
             $avgRating = $userModel->getAverageRating($movieTitle);
 
@@ -109,9 +109,10 @@ and starring " . $movie['Actors'] . ".";
                 'avgRating' => round($avgRating, 1),
                 'yourRating' => $rating
             ]);
+            exit;
         } catch (PDOException $e) {
-            error_log("Rating error: " . $e->getMessage());
             echo json_encode(['success' => false, 'error' => 'Database error']);
+            exit;
         }
     }
 

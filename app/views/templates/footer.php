@@ -3,8 +3,6 @@
     <div>
         &copy; <?= date('Y') ?> COSC-4806 Final Project &mdash; MovieApp
     </div>
-    <div style="font-size: .98rem; color: #b4cdff;">
-    </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
