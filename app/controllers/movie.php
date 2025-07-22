@@ -67,10 +67,10 @@ and starring " . $movie['Actors'] . ".";
     }
 
     public function rate() {
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
-        header('Content-Type: application/json');
+        if (session_status() == PHP_SESSION_NONE) session_start();
+        header('Content-Type: application/json; charset=utf-8');
+        ini_set('display_errors', 0); 
+        ob_clean(); 
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
@@ -115,6 +115,7 @@ and starring " . $movie['Actors'] . ".";
             exit;
         }
     }
+
 
     public function top() {
         $userModel = $this->model('User');
