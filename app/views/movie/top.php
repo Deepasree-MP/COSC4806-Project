@@ -15,25 +15,28 @@
                 $omdb = $data;
             }
         }
+        $movieUrl = '/movie/search?title=' . urlencode($row['movie_title']);
         ?>
         <div class="col-md-4 col-lg-3">
-          <div class="card h-100 shadow-sm">
-            <?php if ($omdb && !empty($omdb['Poster']) && $omdb['Poster'] !== 'N/A'): ?>
-              <img src="<?= htmlspecialchars($omdb['Poster']) ?>" class="card-img-top" alt="Poster for <?= htmlspecialchars($row['movie_title']) ?>">
-            <?php else: ?>
-              <div class="bg-secondary text-center text-white d-flex align-items-center justify-content-center" style="height:320px;">No Image</div>
-            <?php endif; ?>
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title"><?= htmlspecialchars($row['movie_title']) ?></h5>
-              <div class="mb-2">
-                <span class="fw-bold">User Avg: <?= round($row['avg_rating'], 2) ?>/5</span>
-                <span class="text-muted ms-2">(<?= $row['count'] ?> ratings)</span>
-              </div>
-              <?php if ($omdb && !empty($omdb['Plot']) && $omdb['Plot'] !== 'N/A'): ?>
-                <p class="card-text small"><?= htmlspecialchars($omdb['Plot']) ?></p>
+          <a href="<?= $movieUrl ?>" style="text-decoration:none; color:inherit;">
+            <div class="card h-100 shadow-sm" style="cursor:pointer;">
+              <?php if ($omdb && !empty($omdb['Poster']) && $omdb['Poster'] !== 'N/A'): ?>
+                <img src="<?= htmlspecialchars($omdb['Poster']) ?>" class="card-img-top" alt="Poster for <?= htmlspecialchars($row['movie_title']) ?>">
+              <?php else: ?>
+                <div class="bg-secondary text-center text-white d-flex align-items-center justify-content-center" style="height:320px;">No Image</div>
               <?php endif; ?>
+              <div class="card-body d-flex flex-column">
+                <h5 class="card-title"><?= htmlspecialchars($row['movie_title']) ?></h5>
+                <div class="mb-2">
+                  <span class="fw-bold">User Avg: <?= round($row['avg_rating'], 2) ?>/5</span>
+                  <span class="text-muted ms-2">(<?= $row['count'] ?> ratings)</span>
+                </div>
+                <?php if ($omdb && !empty($omdb['Plot']) && $omdb['Plot'] !== 'N/A'): ?>
+                  <p class="card-text small"><?= htmlspecialchars($omdb['Plot']) ?></p>
+                <?php endif; ?>
+              </div>
             </div>
-          </div>
+          </a>
         </div>
       <?php endforeach; ?>
     </div>

@@ -66,12 +66,14 @@
           <li><strong>Stars:</strong> <?= htmlspecialchars($movie['Actors']) ?></li>
         </ul>
 
-        <?php if (!empty($review)): ?>
-          <div class="alert alert-info mt-4 p-4 w-100">
-            <h5 class="mb-2">Gemini Review</h5>
-            <p class="mb-0"><?= nl2br(htmlspecialchars($review)) ?></p>
+        <!-- Gemini Review Container: loaded by AJAX -->
+        <div id="gemini-review-container">
+          <div class="alert alert-info mt-4 p-4 w-100" id="gemini-loading" style="min-height:90px">
+            <span class="spinner-border spinner-border-sm text-warning" role="status"></span>
+            <span class="ms-2">Loading Gemini AI review...</span>
           </div>
-        <?php endif; ?>
+        </div>
+
       </div>
     </div>
   <?php else: ?>
@@ -81,6 +83,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // ---------- Rating logic ----------
   const starTrigger = document.querySelectorAll('#starTrigger .trigger-star');
   const movieTitle = document.getElementById('movieTitle')?.value;
   const banner = document.getElementById('rating-banner');
@@ -92,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
       star.style.color = i < val ? 'gold' : '#ccc';
     });
   }
-
   setTriggerStars(selected);
 
   starTrigger.forEach((star, i) => {
@@ -141,6 +143,31 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   });
+
+
+  <?php if (!empty($movie) && $movie['Response'] === 'True'): ?>
+  fetch('/movie/getGeminiReviewAjax', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `title=<?= urlencode($movie['Title']) ?>&year=<?= urlencode($movie['Year']) ?>&director=<?= urlencode($movie['Director']) ?>&writer=<?= urlencode($movie['Writer']) ?>&actors=<?= urlencode($movie['Actors']) ?>`
+  })
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById('gemini-review-container');
+    if (data.success && data.review) {
+      container.innerHTML = `<div class="alert alert-info mt-4 p-4 w-100">
+        <h5 class="mb-2">Gemini Review</h5>
+        <p class="mb-0">${data.review.replace(/\n/g, '<br>')}</p>
+      </div>`;
+    } else {
+      container.innerHTML = '<div class="alert alert-warning mt-4 p-4 w-100">No Gemini AI review could be generated at this time.</div>';
+    }
+  })
+  .catch(() => {
+    document.getElementById('gemini-review-container').innerHTML =
+      '<div class="alert alert-warning mt-4 p-4 w-100">Failed to load Gemini review.</div>';
+  });
+  <?php endif; ?>
 });
 </script>
 

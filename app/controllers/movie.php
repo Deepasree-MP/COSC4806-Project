@@ -43,7 +43,7 @@ Released in " . $movie['Year'] . ", directed by " . $movie['Director'] . ", writ
 and starring " . $movie['Actors'] . ".";
 
                     require_once 'app/models/Api.php';
-                    $review = Api::getGeminiReview($fullPrompt);
+                    //$review = Api::getGeminiReview($fullPrompt);
                 }
             }
         }
@@ -166,5 +166,29 @@ and starring " . $movie['Actors'] . ".";
         echo json_encode($results);
         exit;
     }
+
+    public function getGeminiReviewAjax() {
+        header('Content-Type: application/json; charset=utf-8');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'error' => 'Invalid request method']);
+            exit;
+        }
+        $title = trim($_POST['title'] ?? '');
+        $year = trim($_POST['year'] ?? '');
+        $director = trim($_POST['director'] ?? '');
+        $writer = trim($_POST['writer'] ?? '');
+        $actors = trim($_POST['actors'] ?? '');
+        if (!$title || !$year || !$director || !$writer || !$actors) {
+            echo json_encode(['success' => false, 'error' => 'Missing fields']);
+            exit;
+        }
+        require_once 'app/models/Api.php';
+        $prompt = "Give a short movie review for the movie titled '$title'. Released in $year, directed by $director, written by $writer, and starring $actors.";
+        $review = Api::getGeminiReview($prompt);
+        echo json_encode(['success' => true, 'review' => $review]);
+        exit;
+    }
+
 
 }
