@@ -23,7 +23,7 @@ class App {
             $this->controller = $url[1];
             unset($url[1]);
         } elseif (!isset($url[1]) || empty($url[1])) {
-            $this->controller = 'home'; // Always go to home for new/guest visitor
+            $this->controller = 'home'; 
         }
 
         require_once 'app/controllers/' . $this->controller . '.php';
